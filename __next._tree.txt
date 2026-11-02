@@ -1,4 +1,4 @@
 :HL["/_next/static/chunks/0k40h7744xl7x.css","style"]
 :HL["https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500;600&display=swap","style"]
 1:[["children",{"s":"__PAGE__","h":160}]]
-0:{"b":"48l9LttSXvqECX3xXGEht","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"nlx_nX9gQA5AM86QGNC60","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
