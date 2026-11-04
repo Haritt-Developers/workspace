@@ -122,7 +122,7 @@ var HDC = (function () {
   };
 })();
 
-/* ===== Extensions: SHA-256, X25519 (BigInt), key text format, backup envelope (.hdbak) =====
+/* ===== Extensions: SHA-256, X25519, key text format, backup envelope (.hdbak) =====
  * Design: backup body is AES-256-GCM encrypted with a random DEK. The DEK is wrapped twice:
  *   wrapK = AES-GCM(K, DEK)              K = online key in Script Properties (daily use)
  *   wrapR = ECIES(X25519) to R_pub       R_pub is stored online, the PRIVATE recovery key R never is (printed offline).
@@ -152,27 +152,51 @@ HDC.sha256 = (function () {
   };
 })();
 
-HDC.x25519 = function (k, u) {
-  var P = (1n << 255n) - 19n, A24 = 121665n, i;
-  var kk = Array.prototype.slice.call(k); kk[0] &= 248; kk[31] &= 127; kk[31] |= 64;
-  var uu = Array.prototype.slice.call(u); uu[31] &= 127;
-  var s = 0n, x1 = 0n; for (i = 31; i >= 0; i--) { s = (s << 8n) | BigInt(kk[i]); x1 = (x1 << 8n) | BigInt(uu[i]); }
-  x1 %= P;
-  var x2 = 1n, z2 = 0n, x3 = x1, z3 = 1n, swap = 0n, t, tmp;
-  for (t = 254; t >= 0; t--) {
-    var kt = (s >> BigInt(t)) & 1n; swap ^= kt;
-    if (swap) { tmp = x2; x2 = x3; x3 = tmp; tmp = z2; z2 = z3; z3 = tmp; }
-    swap = kt;
-    var A = (x2 + z2) % P, AA = A * A % P, B = (x2 - z2 + P) % P, BB = B * B % P, E = (AA - BB + P) % P;
-    var C = (x3 + z3) % P, D = (x3 - z3 + P) % P, DA = D * A % P, CB = C * B % P;
-    x3 = (DA + CB) % P; x3 = x3 * x3 % P; z3 = (DA - CB + P) % P; z3 = z3 * z3 % P * x1 % P;
-    x2 = AA * BB % P; z2 = E * ((AA + A24 * E) % P) % P;
+HDC.x25519 = (function () {
+  /* Curve25519 on 16 x 16-bit limbs (TweetNaCl method, public domain). No BigInt: Apps Script's parser rejects it. */
+  function gf() { return new Float64Array(16); }
+  var C121665 = new Float64Array([0xdb41, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  function car(o) { var i, v, c = 1; for (i = 0; i < 16; i++) { v = o[i] + c + 65535; c = Math.floor(v / 65536); o[i] = v - c * 65536; } o[0] += c - 1 + 37 * (c - 1); }
+  function sel(p, q, b) { var t, c = ~(b - 1), i; for (i = 0; i < 16; i++) { t = c & (p[i] ^ q[i]); p[i] ^= t; q[i] ^= t; } }
+  function pack(o, n) {
+    var i, j, b, m = gf(), t = gf();
+    for (i = 0; i < 16; i++) t[i] = n[i]; car(t); car(t); car(t);
+    for (j = 0; j < 2; j++) {
+      m[0] = t[0] - 0xffed;
+      for (i = 1; i < 15; i++) { m[i] = t[i] - 0xffff - ((m[i - 1] >> 16) & 1); m[i - 1] &= 0xffff; }
+      m[15] = t[15] - 0x7fff - ((m[14] >> 16) & 1); b = (m[15] >> 16) & 1; m[14] &= 0xffff; sel(t, m, 1 - b);
+    }
+    for (i = 0; i < 16; i++) { o[2 * i] = t[i] & 0xff; o[2 * i + 1] = t[i] >> 8; }
   }
-  if (swap) { tmp = x2; x2 = x3; x3 = tmp; tmp = z2; z2 = z3; z3 = tmp; }
-  var inv = 1n, base = z2, e = P - 2n; while (e > 0n) { if (e & 1n) inv = inv * base % P; base = base * base % P; e >>= 1n; }
-  var r = x2 * inv % P, out = new Uint8Array(32); for (i = 0; i < 32; i++) { out[i] = Number(r & 255n); r >>= 8n; }
-  return out;
-};
+  function unpack(o, n) { for (var i = 0; i < 16; i++) o[i] = n[2 * i] + (n[2 * i + 1] << 8); o[15] &= 0x7fff; }
+  function A(o, a, b) { for (var i = 0; i < 16; i++) o[i] = a[i] + b[i]; }
+  function Z(o, a, b) { for (var i = 0; i < 16; i++) o[i] = a[i] - b[i]; }
+  function M(o, a, b) {
+    var i, j, t = new Float64Array(31);
+    for (i = 0; i < 16; i++) for (j = 0; j < 16; j++) t[i + j] += a[i] * b[j];
+    for (i = 0; i < 15; i++) t[i] += 38 * t[i + 16];
+    for (i = 0; i < 16; i++) o[i] = t[i];
+    car(o); car(o);
+  }
+  function S(o, a) { M(o, a, a); }
+  function inv(o, i) { var c = gf(), a; for (a = 0; a < 16; a++) c[a] = i[a]; for (a = 253; a >= 0; a--) { S(c, c); if (a !== 2 && a !== 4) M(c, c, i); } for (a = 0; a < 16; a++) o[a] = c[a]; }
+  return function (k, u) {
+    var z = new Uint8Array(32), x = new Float64Array(80), a = gf(), b = gf(), c = gf(), d = gf(), e = gf(), f = gf(), i, r, q = new Uint8Array(32);
+    for (i = 0; i < 32; i++) z[i] = k[i]; z[31] = (z[31] & 127) | 64; z[0] &= 248;
+    unpack(x, u);
+    for (i = 0; i < 16; i++) { b[i] = x[i]; d[i] = a[i] = c[i] = 0; } a[0] = d[0] = 1;
+    for (i = 254; i >= 0; --i) {
+      r = (z[i >>> 3] >>> (i & 7)) & 1;
+      sel(a, b, r); sel(c, d, r);
+      A(e, a, c); Z(a, a, c); A(c, b, d); Z(b, b, d); S(d, e); S(f, a); M(a, c, a); M(c, b, e); A(e, a, c); Z(a, a, c); S(b, a); Z(c, d, f); M(a, c, C121665); A(a, a, d); M(c, c, a); M(a, d, f); M(d, b, x); S(b, e);
+      sel(a, b, r); sel(c, d, r);
+    }
+    for (i = 0; i < 16; i++) { x[i + 16] = a[i]; x[i + 32] = c[i]; x[i + 48] = b[i]; x[i + 64] = d[i]; }
+    var x32 = x.subarray(32), x16 = x.subarray(16);
+    inv(x32, x32); M(x16, x16, x32); pack(q, x16);
+    return q;
+  };
+})();
 HDC.pub = function (priv) { var nine = new Uint8Array(32); nine[0] = 9; return HDC.x25519(priv, nine); };
 
 /* key text: base32 of 32 key bytes + 2 checksum bytes, groups of 5 */
