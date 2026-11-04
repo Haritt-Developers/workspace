@@ -1,0 +1,242 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Haritt Developers Offline Restore</title>
+<style>:root{color-scheme:light}body{margin:0;background:#F6F7F9;color:#14161B;font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:620px;margin:0 auto;padding:28px 16px;display:flex;flex-direction:column;gap:14px}
+h1{font-size:20px;margin:0}p{margin:0;color:#5B6270}.box{background:#fff;border:1px solid #E3E5EA;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+label{font-weight:600;font-size:13px}input[type=text],input[type=file]{font:inherit;padding:9px 10px;border:1px solid #D2D6DD;border-radius:8px;width:100%;box-sizing:border-box;background:#fff}
+button{font:600 14px system-ui;background:#E8461F;color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;width:fit-content}button:focus-visible,input:focus-visible{outline:2px solid #E8461F;outline-offset:2px}
+.ok{color:#127A56;font-weight:600}.err{color:#BE2B2B;font-weight:600}pre{background:#14161B;color:#E8EAEE;border-radius:8px;padding:12px;overflow:auto;max-height:260px;font-size:12px;margin:0}</style></head><body><main>
+<h1>Haritt Developers · Offline Restore</h1><p>Runs entirely in this browser. Nothing is uploaded. Works with no internet, no Google account and no Apps Script.</p>
+<div class="box"><label for="f">1. Encrypted backup file (.hdbak)</label><input type="file" id="f" accept=".hdbak,.json,application/json">
+<label for="k">2. Recovery key</label><input type="text" id="k" autocomplete="off" spellcheck="false" placeholder="XXXXX-XXXXX-XXXXX-…">
+<button id="go" type="button">Decrypt backup</button><div id="st" role="status"></div></div>
+<div class="box" id="out" hidden><div class="ok" id="sum"></div><button id="dl" type="button">Save decrypted JSON</button><pre id="pre"></pre></div>
+</main><script>
+/* Pure-JS AES-256-GCM (Apps Script has no native AES-GCM). Verified against WebCrypto/OpenSSL in tests/crypto.test.js.
+ * API: HDC.encrypt(key32, iv12, plain) -> {ct, tag};  HDC.decrypt(key32, iv12, ct, tag) -> plain (throws on bad tag).
+ * All arguments/returns are Uint8Array. */
+var HDC = (function () {
+  var SB = new Uint8Array(256);
+  (function () {
+    var p = 1, q = 1;
+    var rot = function (x, n) { return ((x << n) | (x >> (8 - n))) & 255; };
+    do {
+      p = (p ^ ((p << 1) & 255) ^ ((p & 0x80) ? 0x1b : 0)) & 255;
+      q ^= (q << 1) & 255; q ^= (q << 2) & 255; q ^= (q << 4) & 255; q &= 255;
+      if (q & 0x80) q ^= 0x09;
+      SB[p] = (q ^ rot(q, 1) ^ rot(q, 2) ^ rot(q, 3) ^ rot(q, 4) ^ 0x63) & 255;
+    } while (p !== 1);
+    SB[0] = 0x63;
+  })();
+  var xt = function (x) { return ((x << 1) ^ ((x & 0x80) ? 0x1b : 0)) & 255; };
+
+  function expandKey(key) {
+    var w = new Uint8Array(240), i, t = new Uint8Array(4), rc = 1;
+    w.set(key);
+    for (i = 8; i < 60; i++) {
+      t[0] = w[(i - 1) * 4]; t[1] = w[(i - 1) * 4 + 1]; t[2] = w[(i - 1) * 4 + 2]; t[3] = w[(i - 1) * 4 + 3];
+      if (i % 8 === 0) {
+        var a = t[0]; t[0] = SB[t[1]] ^ rc; t[1] = SB[t[2]]; t[2] = SB[t[3]]; t[3] = SB[a]; rc = xt(rc);
+      } else if (i % 8 === 4) { t[0] = SB[t[0]]; t[1] = SB[t[1]]; t[2] = SB[t[2]]; t[3] = SB[t[3]]; }
+      for (var j = 0; j < 4; j++) w[i * 4 + j] = w[(i - 8) * 4 + j] ^ t[j];
+    }
+    return w;
+  }
+
+  function encBlock(w, inp, out) {
+    var s = new Uint8Array(16), r, i, t = new Uint8Array(16);
+    for (i = 0; i < 16; i++) s[i] = inp[i] ^ w[i];
+    for (r = 1; r <= 14; r++) {
+      for (i = 0; i < 16; i++) s[i] = SB[s[i]];
+      // ShiftRows (column-major state)
+      t[0] = s[0]; t[1] = s[5]; t[2] = s[10]; t[3] = s[15];
+      t[4] = s[4]; t[5] = s[9]; t[6] = s[14]; t[7] = s[3];
+      t[8] = s[8]; t[9] = s[13]; t[10] = s[2]; t[11] = s[7];
+      t[12] = s[12]; t[13] = s[1]; t[14] = s[6]; t[15] = s[11];
+      if (r < 14) {
+        for (var c = 0; c < 4; c++) {
+          var a0 = t[c * 4], a1 = t[c * 4 + 1], a2 = t[c * 4 + 2], a3 = t[c * 4 + 3], x = a0 ^ a1 ^ a2 ^ a3;
+          s[c * 4] = a0 ^ x ^ xt(a0 ^ a1); s[c * 4 + 1] = a1 ^ x ^ xt(a1 ^ a2);
+          s[c * 4 + 2] = a2 ^ x ^ xt(a2 ^ a3); s[c * 4 + 3] = a3 ^ x ^ xt(a3 ^ a0);
+        }
+      } else s.set(t);
+      for (i = 0; i < 16; i++) s[i] ^= w[r * 16 + i];
+    }
+    out.set(s);
+  }
+
+  var words = function (b, o) { return [((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0, ((b[o + 4] << 24) | (b[o + 5] << 16) | (b[o + 6] << 8) | b[o + 7]) >>> 0, ((b[o + 8] << 24) | (b[o + 9] << 16) | (b[o + 10] << 8) | b[o + 11]) >>> 0, ((b[o + 12] << 24) | (b[o + 13] << 16) | (b[o + 14] << 8) | b[o + 15]) >>> 0]; };
+
+  function gmul(x, h) {
+    var z0 = 0, z1 = 0, z2 = 0, z3 = 0, v0 = h[0], v1 = h[1], v2 = h[2], v3 = h[3];
+    for (var i = 0; i < 128; i++) {
+      if ((x[i >> 5] >>> (31 - (i & 31))) & 1) { z0 ^= v0; z1 ^= v1; z2 ^= v2; z3 ^= v3; }
+      var lsb = v3 & 1;
+      v3 = ((v3 >>> 1) | (v2 << 31)) >>> 0; v2 = ((v2 >>> 1) | (v1 << 31)) >>> 0; v1 = ((v1 >>> 1) | (v0 << 31)) >>> 0; v0 = v0 >>> 1;
+      if (lsb) v0 = (v0 ^ 0xe1000000) >>> 0;
+    }
+    return [z0 >>> 0, z1 >>> 0, z2 >>> 0, z3 >>> 0];
+  }
+
+  function ghash(h, ct) {
+    var y = [0, 0, 0, 0], blk = new Uint8Array(16), i, n = ct.length;
+    for (i = 0; i < n; i += 16) {
+      blk.fill(0); blk.set(ct.subarray(i, Math.min(i + 16, n)));
+      var b = words(blk, 0);
+      y = gmul([(y[0] ^ b[0]) >>> 0, (y[1] ^ b[1]) >>> 0, (y[2] ^ b[2]) >>> 0, (y[3] ^ b[3]) >>> 0], h);
+    }
+    var bits = n * 8; // length block: len(A)=0, len(C)
+    y = gmul([y[0], y[1], (y[2] ^ Math.floor(bits / 4294967296)) >>> 0, (y[3] ^ (bits >>> 0)) >>> 0], h);
+    var out = new Uint8Array(16);
+    for (i = 0; i < 4; i++) { out[i * 4] = y[i] >>> 24; out[i * 4 + 1] = (y[i] >>> 16) & 255; out[i * 4 + 2] = (y[i] >>> 8) & 255; out[i * 4 + 3] = y[i] & 255; }
+    return out;
+  }
+
+  function setup(key, iv) {
+    if (key.length !== 32 || iv.length !== 12) throw new Error('key must be 32 bytes and iv 12 bytes');
+    var w = expandKey(key), z = new Uint8Array(16), hb = new Uint8Array(16), j0 = new Uint8Array(16);
+    encBlock(w, z, hb); j0.set(iv); j0[15] = 1;
+    return { w: w, h: words(hb, 0), j0: j0 };
+  }
+  function ctr(w, j0, data) {
+    var out = new Uint8Array(data.length), cb = new Uint8Array(j0), ks = new Uint8Array(16), c = 1;
+    for (var i = 0; i < data.length; i += 16) {
+      c++; cb[12] = (c >>> 24) & 255; cb[13] = (c >>> 16) & 255; cb[14] = (c >>> 8) & 255; cb[15] = c & 255;
+      encBlock(w, cb, ks);
+      for (var k = 0; k < 16 && i + k < data.length; k++) out[i + k] = data[i + k] ^ ks[k];
+    }
+    return out;
+  }
+  function tagOf(s, ct) {
+    var g = ghash(s.h, ct), e = new Uint8Array(16);
+    encBlock(s.w, s.j0, e);
+    for (var i = 0; i < 16; i++) g[i] ^= e[i];
+    return g;
+  }
+  return {
+    encrypt: function (key, iv, plain) { var s = setup(key, iv), ct = ctr(s.w, s.j0, plain); return { ct: ct, tag: tagOf(s, ct) }; },
+    decrypt: function (key, iv, ct, tag) {
+      var s = setup(key, iv), t = tagOf(s, ct), bad = 0;
+      for (var i = 0; i < 16; i++) bad |= t[i] ^ tag[i];
+      if (bad) throw new Error('Authentication failed (wrong key or corrupted data)');
+      return ctr(s.w, s.j0, ct);
+    }
+  };
+})();
+
+/* ===== Extensions: SHA-256, X25519 (BigInt), key text format, backup envelope (.hdbak) =====
+ * Design: backup body is AES-256-GCM encrypted with a random DEK. The DEK is wrapped twice:
+ *   wrapK = AES-GCM(K, DEK)              K = online key in Script Properties (daily use)
+ *   wrapR = ECIES(X25519) to R_pub       R_pub is stored online, the PRIVATE recovery key R never is (printed offline).
+ * Restore without Google/Apps Script needs only the .hdbak file + R (see restore.html). */
+HDC.sha256 = (function () {
+  var K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var rr = function (x, n) { return (x >>> n) | (x << (32 - n)); };
+  return function (data) {
+    var n = data.length, padLen = ((n + 9 + 63) >> 6) << 6, m = new Uint8Array(padLen), i, j;
+    m.set(data); m[n] = 0x80;
+    var bits = n * 8; m[padLen - 4] = (bits >>> 24) & 255; m[padLen - 3] = (bits >>> 16) & 255; m[padLen - 2] = (bits >>> 8) & 255; m[padLen - 1] = bits & 255;
+    m[padLen - 8] = Math.floor(n / 536870912) & 255; // high bits of length (n < 2^53)
+    var h = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19], w = new Array(64);
+    for (i = 0; i < padLen; i += 64) {
+      for (j = 0; j < 16; j++) w[j] = (m[i + j * 4] << 24) | (m[i + j * 4 + 1] << 16) | (m[i + j * 4 + 2] << 8) | m[i + j * 4 + 3];
+      for (j = 16; j < 64; j++) { var s0 = rr(w[j - 15], 7) ^ rr(w[j - 15], 18) ^ (w[j - 15] >>> 3), s1 = rr(w[j - 2], 17) ^ rr(w[j - 2], 19) ^ (w[j - 2] >>> 10); w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0; }
+      var a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], hh = h[7];
+      for (j = 0; j < 64; j++) {
+        var S1 = rr(e, 6) ^ rr(e, 11) ^ rr(e, 25), ch = (e & f) ^ (~e & g), t1 = (hh + S1 + ch + K[j] + w[j]) | 0;
+        var S0 = rr(a, 2) ^ rr(a, 13) ^ rr(a, 22), mj = (a & b) ^ (a & c) ^ (b & c), t2 = (S0 + mj) | 0;
+        hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+      }
+      h[0] = (h[0] + a) | 0; h[1] = (h[1] + b) | 0; h[2] = (h[2] + c) | 0; h[3] = (h[3] + d) | 0; h[4] = (h[4] + e) | 0; h[5] = (h[5] + f) | 0; h[6] = (h[6] + g) | 0; h[7] = (h[7] + hh) | 0;
+    }
+    var o = new Uint8Array(32); for (i = 0; i < 8; i++) { o[i * 4] = h[i] >>> 24; o[i * 4 + 1] = (h[i] >>> 16) & 255; o[i * 4 + 2] = (h[i] >>> 8) & 255; o[i * 4 + 3] = h[i] & 255; }
+    return o;
+  };
+})();
+
+HDC.x25519 = function (k, u) {
+  var P = (1n << 255n) - 19n, A24 = 121665n, i;
+  var kk = Array.prototype.slice.call(k); kk[0] &= 248; kk[31] &= 127; kk[31] |= 64;
+  var uu = Array.prototype.slice.call(u); uu[31] &= 127;
+  var s = 0n, x1 = 0n; for (i = 31; i >= 0; i--) { s = (s << 8n) | BigInt(kk[i]); x1 = (x1 << 8n) | BigInt(uu[i]); }
+  x1 %= P;
+  var x2 = 1n, z2 = 0n, x3 = x1, z3 = 1n, swap = 0n, t, tmp;
+  for (t = 254; t >= 0; t--) {
+    var kt = (s >> BigInt(t)) & 1n; swap ^= kt;
+    if (swap) { tmp = x2; x2 = x3; x3 = tmp; tmp = z2; z2 = z3; z3 = tmp; }
+    swap = kt;
+    var A = (x2 + z2) % P, AA = A * A % P, B = (x2 - z2 + P) % P, BB = B * B % P, E = (AA - BB + P) % P;
+    var C = (x3 + z3) % P, D = (x3 - z3 + P) % P, DA = D * A % P, CB = C * B % P;
+    x3 = (DA + CB) % P; x3 = x3 * x3 % P; z3 = (DA - CB + P) % P; z3 = z3 * z3 % P * x1 % P;
+    x2 = AA * BB % P; z2 = E * ((AA + A24 * E) % P) % P;
+  }
+  if (swap) { tmp = x2; x2 = x3; x3 = tmp; tmp = z2; z2 = z3; z3 = tmp; }
+  var inv = 1n, base = z2, e = P - 2n; while (e > 0n) { if (e & 1n) inv = inv * base % P; base = base * base % P; e >>= 1n; }
+  var r = x2 * inv % P, out = new Uint8Array(32); for (i = 0; i < 32; i++) { out[i] = Number(r & 255n); r >>= 8n; }
+  return out;
+};
+HDC.pub = function (priv) { var nine = new Uint8Array(32); nine[0] = 9; return HDC.x25519(priv, nine); };
+
+/* key text: base32 of 32 key bytes + 2 checksum bytes, groups of 5 */
+HDC.B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+HDC.keyToText = function (k) {
+  var c = HDC.sha256(k), all = new Uint8Array(34), bits = '', o = '', i; all.set(k); all[32] = c[0]; all[33] = c[1];
+  for (i = 0; i < 34; i++) bits += (all[i] + 256).toString(2).slice(1);
+  for (i = 0; i < bits.length; i += 5) o += HDC.B32.charAt(parseInt((bits.slice(i, i + 5) + '0000').slice(0, 5), 2));
+  return o.match(/.{1,5}/g).join('-');
+};
+HDC.textToKey = function (text) {
+  var t = String(text).replace(/[^A-Za-z2-7]/g, '').toUpperCase(), bits = '', by = [], i;
+  for (i = 0; i < t.length; i++) bits += (HDC.B32.indexOf(t.charAt(i)) + 32).toString(2).slice(1);
+  for (i = 0; i + 8 <= bits.length; i += 8) by.push(parseInt(bits.slice(i, i + 8), 2));
+  if (by.length < 34) throw new Error('Recovery key is too short');
+  var k = new Uint8Array(by.slice(0, 32)), c = HDC.sha256(k);
+  if (c[0] !== by[32] || c[1] !== by[33]) throw new Error('Recovery key typo (checksum does not match)');
+  return k;
+};
+
+/* base64 helpers that work in Apps Script, Node and browsers */
+HDC.b64 = function (u8) { var s = '', i; for (i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return (typeof btoa === 'function') ? btoa(s) : Buffer.from(u8).toString('base64'); };
+HDC.unb64 = function (s) { if (typeof atob === 'function') { var b = atob(s), o = new Uint8Array(b.length), i; for (i = 0; i < b.length; i++) o[i] = b.charCodeAt(i); return o; } return new Uint8Array(Buffer.from(s, 'base64')); };
+HDC.hex = function (u8) { var s = '', i; for (i = 0; i < u8.length; i++) s += (u8[i] + 256).toString(16).slice(1); return s; };
+HDC.utf8 = function (s) { var o = [], i, c; s = unescape(encodeURIComponent(s)); for (i = 0; i < s.length; i++) o.push(s.charCodeAt(i)); return new Uint8Array(o); };
+HDC.fromUtf8 = function (u8) { var s = '', i; for (i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return decodeURIComponent(escape(s)); };
+HDC.cat = function () { var n = 0, i, a = arguments; for (i = 0; i < a.length; i++) n += a[i].length; var o = new Uint8Array(n), p = 0; for (i = 0; i < a.length; i++) { o.set(a[i], p); p += a[i].length; } return o; };
+
+HDC._pack = function (r) { return { iv: null, ct: HDC.b64(r.ct), tag: HDC.b64(r.tag) }; };
+HDC._kek = function (shared, epk, rpub) { return HDC.sha256(HDC.cat(HDC.utf8('hdbak-wrapR-v2'), shared, epk, rpub)); };
+
+/* seal(json, {K: Uint8Array(32), Rpub: Uint8Array(32), date, kid, rid, rand: function(n)->Uint8Array}) -> envelope object */
+HDC.seal = function (json, o) {
+  var dek = o.rand(32), iv = o.rand(12), body = HDC.encrypt(dek, iv, HDC.utf8(json));
+  var ivK = o.rand(12), wk = HDC.encrypt(o.K, ivK, dek);
+  var esk = o.rand(32), epk = HDC.pub(esk), shared = HDC.x25519(esk, o.Rpub), ivR = o.rand(12), wr = HDC.encrypt(HDC._kek(shared, epk, o.Rpub), ivR, dek);
+  var env = { v: 2, alg: 'AES-256-GCM', date: o.date, kid: o.kid || 'k1', rid: o.rid || 'r1',
+    body: { iv: HDC.b64(iv), ct: HDC.b64(body.ct), tag: HDC.b64(body.tag) },
+    wrapK: { iv: HDC.b64(ivK), ct: HDC.b64(wk.ct), tag: HDC.b64(wk.tag) },
+    wrapR: { epk: HDC.b64(epk), iv: HDC.b64(ivR), ct: HDC.b64(wr.ct), tag: HDC.b64(wr.tag) } };
+  env.sha256 = HDC.hex(HDC.sha256(HDC.utf8(JSON.stringify(env.body))));
+  return env;
+};
+/* open(env, {K} or {R}) -> json string. Checks integrity hash first, then GCM tags. */
+HDC.open = function (env, k) {
+  if (env.v !== 2) throw new Error('Unsupported backup version');
+  if (HDC.hex(HDC.sha256(HDC.utf8(JSON.stringify(env.body)))) !== env.sha256) throw new Error('Backup file corrupted (checksum mismatch)');
+  var dek;
+  if (k.K) { var w = env.wrapK; dek = HDC.decrypt(k.K, HDC.unb64(w.iv), HDC.unb64(w.ct), HDC.unb64(w.tag)); }
+  else {
+    var r = env.wrapR, epk = HDC.unb64(r.epk), rpub = HDC.pub(k.R), shared = HDC.x25519(k.R, epk);
+    dek = HDC.decrypt(HDC._kek(shared, epk, rpub), HDC.unb64(r.iv), HDC.unb64(r.ct), HDC.unb64(r.tag));
+  }
+  var b = env.body; return HDC.fromUtf8(HDC.decrypt(dek, HDC.unb64(b.iv), HDC.unb64(b.ct), HDC.unb64(b.tag)));
+};
+
+(function(){var st=document.getElementById('st'),out=document.getElementById('out'),text=null;
+function say(m,c){st.className=c||'';st.textContent=m}
+document.getElementById('go').onclick=function(){out.hidden=true;try{
+ var f=document.getElementById('f').files[0];if(!f)throw new Error('Choose the .hdbak file first');
+ var rd=new FileReader();rd.onload=function(){try{var env=JSON.parse(rd.result),R=HDC.textToKey(document.getElementById('k').value);
+  text=HDC.open(env,{R:R});var d=JSON.parse(text),n=0,c=[];Object.keys(d.collections||d).forEach(function(k){var v=(d.collections||d)[k];if(v&&typeof v==='object'){var m=Array.isArray(v)?v.length:Object.keys(v).length;n+=m;c.push(k+': '+m)}});
+  say('Decrypted and verified.','ok');out.hidden=false;document.getElementById('sum').textContent='Backup of '+(env.date||'unknown date')+' · '+c.join(', ');document.getElementById('pre').textContent=text.slice(0,4000)+(text.length>4000?'\n…':'');
+ }catch(e){text=null;say('Error: '+e.message,'err')}};rd.readAsText(f)}catch(e){say('Error: '+e.message,'err')}};
+document.getElementById('dl').onclick=function(){if(!text)return;var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json'}));a.download='workspace-restored.json';a.click()};
+})();
+</script></body></html>
