@@ -126,7 +126,7 @@ function screenGate(err,email){
   '<label>Email</label><input id="em" type="email" inputmode="email" autocomplete="email" autocapitalize="none" value="'+esc(email||"")+'"><div class="err" id="err">'+(err||"")+'</div><button class="btn" id="go" disabled>Send code</button>'+((GID&&GID.indexOf("__")!==0)?'<p class="or">or</p><div id="gb" class="gb"></div>':'')+'</div>');
   gBtn($("#gb"),async cred=>{if(busy)return;busy=true;try{const r=await api({action:"g_login",credential:cred});
     if(!r.ok){$("#err").textContent=r.error==="not_allowed"?"This Google account is not a founder account.":"Could not sign in.";return}
-    SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}const l=await api({action:"list",sess:SESS});if(!l.ok)return;ADM=l;screenConsole()}finally{busy=false}});
+    SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}const l=r.list&&r.list.ok?r.list:await api({action:"list",sess:SESS});if(!l.ok)return;ADM=l;screenConsole()}finally{busy=false}});
   const c=$("#em"),b=$("#go"),ok=()=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.value.trim());c.addEventListener("input",()=>{b.disabled=!ok()});b.disabled=!ok();
   const go=async()=>{if(!ok()||busy)return;busy=true;b.disabled=true;b.textContent="Sending...";$("#err").textContent="";
     try{const r=await api({action:"otp_send",email:c.value.trim()});
