@@ -126,7 +126,7 @@ function screenGate(err,email){
   '<label>Email</label><input id="em" type="email" inputmode="email" autocomplete="email" autocapitalize="none" value="'+esc(email||"")+'"><div class="err" id="err">'+(err||"")+'</div><button class="btn" id="go" disabled>Send code</button>'+((GID&&GID.indexOf("__")!==0)?'<p class="or">or</p><div id="gb" class="gb"></div>':'')+'</div>');
   gBtn($("#gb"),async cred=>{if(busy)return;busy=true;try{const r=await api({action:"g_login",credential:cred});
     if(!r.ok){$("#err").textContent=r.error==="not_allowed"?"This Google account is not a founder account.":"Could not sign in.";return}
-    SESS=r.sess;try{sessionStorage.setItem("hd_sess",SESS)}catch(e){}const l=await api({action:"list",sess:SESS});if(!l.ok)return;ADM=l;screenConsole()}finally{busy=false}});
+    SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}const l=await api({action:"list",sess:SESS});if(!l.ok)return;ADM=l;screenConsole()}finally{busy=false}});
   const c=$("#em"),b=$("#go"),ok=()=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.value.trim());c.addEventListener("input",()=>{b.disabled=!ok()});b.disabled=!ok();
   const go=async()=>{if(!ok()||busy)return;busy=true;b.disabled=true;b.textContent="Sending...";$("#err").textContent="";
     try{const r=await api({action:"otp_send",email:c.value.trim()});
@@ -141,14 +141,18 @@ function screenOtp(email,err){
   const go=async()=>{if(c.value.length!==6||busy)return;busy=true;b.disabled=true;b.textContent="Checking...";
     try{const r=await api({action:"otp_check",email,code:c.value});
       if(!r.ok){$("#err").textContent=r.error==="locked"?"Too many wrong tries. Try again in an hour.":"Wrong or expired code.";b.disabled=false;b.textContent="Open console";return}
-      SESS=r.sess;try{sessionStorage.setItem("hd_sess",SESS)}catch(e){}
+      SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}
       const l=await api({action:"list",sess:SESS});if(!l.ok)return screenGate("Could not open. Try again.");ADM=l;screenConsole()}
     catch(e){$("#err").textContent="No internet or server problem. Try again.";b.disabled=false;b.textContent="Open console"}finally{busy=false}};
   b.onclick=go;c.addEventListener("keydown",e=>{if(e.key==="Enter")go()});$("#bk").onclick=()=>screenGate("",email);c.focus()}
 let WS=null;const WSORIGIN="https://workspace.developers.haritt.com",EMB=true;
-async function wsLogin(d){WS=d;try{const r=await api({action:"fb_login",idToken:d.idToken});
+async function wsLogin(d){WS=d;
+  try{const cs=localStorage.getItem("hd_sess"),ca=JSON.parse(localStorage.getItem("hd_adm")||"null");
+    if(cs&&ca&&ca.docs){SESS=cs;ADM=ca;screenConsole();
+      api({action:"list",sess:cs}).then(l=>{if(l.ok){ADM=l;if($("#nw"))screenConsole()}else{localStorage.removeItem("hd_sess");localStorage.removeItem("hd_adm");if($("#nw"))wsLogin(d)}}).catch(()=>{});return}}catch(e){}
+  try{const r=await api({action:"fb_login",idToken:d.idToken});
   if(!r.ok){return screenGate(r.error==="not_allowed"?"This Workspace account is not a founder account.":"Could not sign in ("+(r.error||"no reply")+").")}
-  SESS=r.sess;try{sessionStorage.setItem("hd_sess",SESS)}catch(e){}const l=await api({action:"list",sess:SESS});if(!l.ok)return screenGate();ADM=l;screenConsole()}catch(e){screenGate("No internet or server problem.")}}
+  SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}const l=await api({action:"list",sess:SESS});if(!l.ok)return screenGate();ADM=l;screenConsole()}catch(e){screenGate("No internet or server problem.")}}
 
 async function resume(){
   if(EMB){show('<div class="spin"></div><p style="text-align:center">Loading...</p>');parent.postMessage({type:"hd-ready"},WSORIGIN);for(let i=0;i<40&&!WS;i++)await new Promise(r=>setTimeout(r,200));if(WS)return}
@@ -156,6 +160,7 @@ async function resume(){
   try{const l=await api({action:"list",sess:s});if(l.ok){SESS=s;ADM=l;return screenConsole()}}catch(e){}screenGate()}
 async function reloadAdm(){const r=await api({action:"list",sess:SESS});if(r.ok)ADM=r}
 function screenConsole(){
+  try{localStorage.setItem("hd_adm",JSON.stringify(ADM))}catch(e){}
   const rows=ADM.docs.map(d=>'<div class="party"><div><div class="nm">'+esc(d.title)+'</div><div class="sub">'+esc(d.names)+'</div>'+((d.project||d.client)?'<div class="sub">'+esc([d.project,d.client].filter(Boolean).join(' · '))+'</div>':'')+'<div class="sub">'+ago(d.created)+' · '+d.signed+' of '+d.total+' signed</div></div>'+
     '<div style="text-align:right"><span class="pill '+(d.complete?"ok":"wait")+'">'+(d.complete?"Completed":"Waiting")+'</span><div class="acts" style="justify-content:flex-end"><button class="btn ghost sm" data-open="'+d.id+'">Open</button></div></div></div>').join("")||'<p style="color:var(--mut)">Nothing sent yet.</p>';
   show('<div class="card top">'+(EMB?'':'<div class="eyebrow">— Founder console</div>')+'<h1>Documents</h1><p>Agreements and contracts sent from Haritt Developers.</p><button class="btn" id="nw">New document</button></div>'+
