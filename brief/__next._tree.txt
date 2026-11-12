@@ -1,5 +1,5 @@
-:HL["/_next/static/chunks/1izsrdh61h4dc.css","style"]
+:HL["/_next/static/chunks/2m-1t-l1zq0fw.css","style"]
 :HL["https://fonts.googleapis.com/css2?family=Sora:wght@500;700&family=Inter:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap","style"]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"brief","h":96,"c":"$Q2"}]]
-0:{"b":"IiHUsRV62VS-7m3PmDD90","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"Bg7NWohjJDmPZsKRWdNpk","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
