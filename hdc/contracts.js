@@ -185,7 +185,7 @@ async function wsLogin(d){WS=d;
       api({action:"list",sess:cs}).then(l=>{if(l.ok){setAdm(l);if($("#nw"))screenConsole()}else{localStorage.removeItem("hd_sess");localStorage.removeItem("hd_adm");if($("#nw"))wsLogin(d)}}).catch(()=>{});return}}catch(e){}
   try{const r=await api({action:"fb_login",idToken:d.idToken});
   if(!r.ok){return screenGate(r.error==="not_allowed"?"This Workspace account is not a founder account.":"Could not sign in ("+(r.error||"no reply")+").")}
-  SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}const l=await api({action:"list",sess:SESS});if(!l.ok)return screenGate();setAdm(l);home(d)}catch(e){console.error(e);screenGate("No internet or server problem.")}}
+  SESS=r.sess;try{localStorage.setItem("hd_sess",SESS)}catch(e){}const l=r.list&&r.list.ok?r.list:await api({action:"list",sess:SESS});if(!l.ok)return screenGate();setAdm(l);home(d)}catch(e){console.error(e);screenGate("No internet or server problem.")}}
 function home(d){const x=d&&d.openDoc;if(x){const dr=(ADM.drafts||[]).find(y=>y.id===x);if(dr)return screenBuilder(null,dr);return screenAdmin(x)}screenConsole()}
 
 async function resume(){
@@ -215,7 +215,7 @@ function wireList(){
   ROOT.querySelectorAll("[data-dd]").forEach(b=>b.onclick=async()=>{if(!await ask({t:"Delete this draft?",m:"The saved draft is removed. You cannot undo this.",ok:"Delete draft",bad:1}))return;b.disabled=true;const r=await api({action:"draft_del",id:b.dataset.dd,sess:SESS});if(r.ok){await reloadAdm();screenConsole();toast("Draft deleted")}else{b.disabled=false;toast("Could not delete")}});
   ROOT.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const d=ADM.docs.find(x=>x.id===b.dataset.rm);if(!d||!await ask({t:'Delete "'+d.title+'"?',m:(d.complete?'This is a signed document. The signers keep their emailed copy. ':'Its signing links will stop working. ')+'It moves to the Drive bin.',ok:"Delete",bad:1}))return;b.disabled=true;const r=await api({action:"del",id:d.id,sess:SESS});if(r.ok){await reloadAdm();screenConsole();toast("Deleted")}else{b.disabled=false;toast(r.error==="forbidden"?"You do not have rights to delete.":"Could not delete. Update the script first.")}})}
 function screenConsole(){
-  try{localStorage.setItem("hd_adm",JSON.stringify(ADM))}catch(e){}
+  try{localStorage.setItem("hd_adm",JSON.stringify(ADM));localStorage.setItem("hd_adm_t",String(Date.now()))}catch(e){}
   const cnt=f=>f==="all"?ADM.docs.length:f==="drafts"?(ADM.drafts||[]).length:ADM.docs.filter(d=>{const s=docState(d);return f==="wait"?(s==="wait"||s==="overdue"):s===f}).length;
   const chips=[["all","All"],["wait","Waiting"],["done","Completed"],["void","Cancelled"],["drafts","Drafts"]];
   show('<div class="card top toolbar"><div><h1>Documents</h1><p style="margin:0">Agreements and contracts sent from Haritt Developers.</p></div><div class="acts" style="margin:0">'+(ME&&ME.admin?'<button class="btn ghost sm" id="ta">Team access</button>':'')+(can("create")?'<button class="btn" id="nw">New document</button>':'')+'</div></div>'+
@@ -557,6 +557,14 @@ function download(blob){const a=document.createElement("a");a.href=URL.createObj
 wsLogin(DATA);
 
 }};
+window.HDContracts.prefetch=async function(idToken){
+ var post=function(b){return fetch("https://script.google.com/macros/s/AKfycbxlnGmdBPvi9BsWG7nxAIY9qWOF2yNGivhxrtj1OSRZ7CZFHkhLCwRcgsUftN_l-c4b/exec",{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(b)}).then(function(r){return r.json()})};
+ var t=0;try{t=Number(localStorage.getItem("hd_adm_t")||0)}catch(e){}
+ if(Date.now()-t<6e5)return;
+ var sess="";try{sess=localStorage.getItem("hd_sess")||""}catch(e){}
+ var l=null;if(sess){try{l=await post({action:"list",sess:sess});if(!l.ok)l=null}catch(e){l=null}}
+ if(!l){var r=await post({action:"fb_login",idToken:idToken});if(!r.ok)return;try{localStorage.setItem("hd_sess",r.sess)}catch(e){}l=r.list&&r.list.ok?r.list:await post({action:"list",sess:r.sess})}
+ if(l&&l.ok){try{localStorage.setItem("hd_adm",JSON.stringify(l));localStorage.setItem("hd_adm_t",String(Date.now()))}catch(e){}}};
 window.HDContracts.docsFor=async function(pid,o){
  var post=function(b){return fetch("https://script.google.com/macros/s/AKfycbxlnGmdBPvi9BsWG7nxAIY9qWOF2yNGivhxrtj1OSRZ7CZFHkhLCwRcgsUftN_l-c4b/exec",{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(b)}).then(function(r){return r.json()})};
  var sess="";try{sess=localStorage.getItem("hd_sess")||""}catch(e){}
