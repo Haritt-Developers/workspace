@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Mock: Unanswered messages</title>
+<style>
+:root{--ink:#14161C;--mute:#6B7080;--line:#E6E8EE;--bg:#F5F6F8;--acc:#E83B07}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;padding:20px 16px 60px}
+.w{max-width:980px;margin:0 auto;display:grid;gap:26px}
+h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 10px}
+.g{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start}
+@media(max-width:820px){.g{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.hd{display:flex;align-items:center;gap:8px;margin-bottom:10px}.hd b{font-size:15px}
+.cnt{background:#FDE7E7;color:#B42318;border-radius:99px;font:700 12px inherit;padding:2px 9px}
+.hd small{margin-left:auto;color:var(--mute);font-size:12px}
+.row{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:flex-start}
+.dot{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:none}.r{background:#E5484D}.o{background:#F5A524}
+.m{flex:1;min-width:0}.m b{display:block;font-size:14px}.m span{display:block;color:var(--mute);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m q{display:block;font-size:13px;margin-top:3px;color:#3a3e4a;quotes:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.age{font:700 12.5px inherit;white-space:nowrap}.age.r2{color:#B42318}.age.o2{color:#B25E09}
+.btn{border:0;background:var(--acc);color:#fff;border-radius:99px;font:600 12.5px inherit;padding:7px 13px;white-space:nowrap}
+.rt{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.tabs{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}.tabs i{font-style:normal;font-size:12.5px;border:1px solid var(--line);border-radius:99px;padding:3px 11px;color:var(--mute)}.tabs i.on{background:#14161C;color:#fff;border-color:#14161C}
+.mail{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.mh{padding:12px 16px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--mute);line-height:1.6}.mh b{color:var(--ink)}
+.mb{padding:20px 18px;display:grid;gap:12px}
+.lg{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.06em;font-size:12px}.lg img{width:26px;height:26px}
+.al{background:#FDECEC;color:#B42318;border-radius:10px;padding:10px 12px;font-weight:600;font-size:14px}
+.kv{display:grid;grid-template-columns:90px 1fr;gap:6px 10px;font-size:13.5px}.kv span{color:var(--mute)}
+.qt{background:#F5F6F8;border-radius:10px;padding:10px 12px;font-size:14px}
+.tl{font-size:12.5px;color:var(--mute)}
+.cta{justify-self:start;background:var(--acc);color:#fff;border-radius:99px;padding:10px 18px;font-weight:600;font-size:14px;text-decoration:none}
+.note{font-size:13px;color:var(--mute)}
+</style></head><body><div class="w">
+<div><h2>1 · Dashboard card (Harsh / Pulkit see this at the top)</h2>
+<div class="card"><div class="hd"><b>Unanswered messages</b><span class="cnt">3</span><small>Client wrote, no reply yet</small></div>
+<div class="tabs"><i class="on">All</i><i>24h+</i><i>48h+</i></div>
+<div class="row"><i class="dot r"></i><div class="m"><b>Riya Store · Online store</b><span>PM: Aman · reminders sent 3 of 3</span><q>“Bhai logo change ho jayega kya aaj?”</q></div><div class="rt"><span class="age r2">2d 3h</span><button class="btn">Open chat</button></div></div>
+<div class="row"><i class="dot r"></i><div class="m"><b>Sharma Traders · Catalogue site</b><span>PM: Harsh · reminders sent 3 of 3</span><q>“Payment ka link bhej do please”</q></div><div class="rt"><span class="age r2">1d 6h</span><button class="btn">Open chat</button></div></div>
+<div class="row"><i class="dot o"></i><div class="m"><b>Jain Clinic · Booking app</b><span>PM: Pulkit · reminders sent 2 of 3</span><q>“Demo kab dikhaoge?”</q></div><div class="rt"><span class="age o2">9h</span><button class="btn">Open chat</button></div></div>
+<p class="note" style="margin:10px 0 0">Red = 24h+ (escalated by email). Orange = waiting, still within reminders. Row disappears once the team replies.</p></div></div>
+
+<div><h2>2 · Escalation email (after reminder 3, only to Harsh + Pulkit)</h2>
+<div class="mail"><div class="mh"><b>From:</b> Haritt Developers &lt;projects@haritt.com&gt;<br><b>To:</b> Harsh, Pulkit<br><b>Subject:</b> Escalation: client waiting 24 hours · HD-2611-K7M4 Online store</div>
+<div class="mb"><div class="lg"><img src="/logo.png" alt="">HARITT DEVELOPERS</div>
+<div class="al">A client message has had no reply for 24 hours</div>
+<div class="kv"><span>Client</span><b>Riya Store</b><span>Project</span><b>HD-2611-K7M4 · Online store</b><span>Manager</span><b>Aman (3 reminders sent)</b><span>Waiting</span><b>24 hours</b></div>
+<div class="tl">THEIR MESSAGE</div><div class="qt">Bhai logo change ho jayega kya aaj?</div>
+<a class="cta" href="#">Open chat</a>
+<div class="note">Sent once per message. It stops as soon as someone replies.</div></div></div></div>
+</div></body></html>
