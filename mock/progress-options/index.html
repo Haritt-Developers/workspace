@@ -1,0 +1,180 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Progress options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F5F1;--card:#fff;--ink:#16171A;--ink2:#3B3C42;--mu:#6B7080;--ln:#ECE9E4;--ln2:#F4F1EC;--track:#EEEAE4;--acc:#E8461F;--accs:#FDEEE9;--dn:#1F9D6B;--dns:#E5F4EC;--hd:#D99A00;--hds:#FFF5D6;--hdt:#7A5200;--nw:#6E56CF;--nws:#F1EDFD}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}svg{display:block}
+.opt{padding:28px 24px 34px;max-width:1180px;margin:0 auto}
+.oh{display:flex;align-items:baseline;gap:10px;margin:0 0 14px}.oh b{font-size:13px;letter-spacing:.14em;color:var(--acc)}.oh h2{margin:0;font-size:21px;letter-spacing:-.01em}.oh span{color:var(--mu);font-size:14px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:24px;padding:26px 28px;box-shadow:0 1px 2px rgba(25,20,10,.04),0 18px 40px -16px rgba(25,20,10,.12)}
+.mu{color:var(--mu)}.sm{font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;border-radius:99px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.pill svg{font-size:12px}.pill.dn{background:var(--dns);color:var(--dn)}.pill.ip{background:var(--accs);color:var(--acc)}.pill.hd{background:var(--hds);color:var(--hdt)}.pill.nw{background:var(--nws);color:var(--nw)}.pill.up{background:var(--ln2);color:var(--mu)}
+.pill i{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pl 1.4s ease-out infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 currentColor}80%,100%{box-shadow:0 0 0 6px transparent}}
+@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1.6s linear infinite}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.big{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--acc)}
+.launch{display:flex;gap:10px;align-items:center;background:var(--ln2);border-radius:14px;padding:9px 14px}.launch svg{font-size:20px;color:var(--mu)}.launch small{display:block;font-size:11.5px;color:var(--mu)}.launch b{font-size:15px}
+
+/* 1 stepper */
+.stp{display:flex;align-items:flex-start;position:relative}
+.st{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;min-width:0}
+.st:before{content:"";position:absolute;top:19px;left:-50%;right:50%;height:4px;background:var(--track);z-index:0}
+.st:first-child:before{display:none}.st.dn:before,.st.hd:before{background:var(--dn)}
+.cir{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:2px solid var(--track);color:var(--mu);font-weight:700;font-size:15px;position:relative;z-index:1}
+.st.dn .cir{background:var(--dn);border-color:var(--dn);color:#fff;font-size:17px}
+.st.hd .cir{background:var(--hds);border-color:var(--hd);color:var(--hdt);font-size:17px;width:50px;height:50px;margin-top:-4px;box-shadow:0 0 0 6px rgba(217,154,0,.12)}
+.st b{margin-top:10px;font-size:14.5px}.st .s{font-size:12.5px;color:var(--mu)}.st.dn .s{color:var(--dn)}.st.hd .s{color:var(--hdt);font-weight:600}
+.st .x{position:absolute;top:-6px;left:calc(50% + 12px);z-index:2;height:20px;padding:0 7px;border-radius:99px;background:var(--nw);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px}
+.now{margin-top:26px;display:flex;gap:14px;align-items:center;border-radius:18px;padding:16px 18px;background:var(--nws)}
+.now .ic{width:40px;height:40px;border-radius:12px;background:var(--nw);color:#fff;display:grid;place-items:center;font-size:20px;flex:none}
+.now b{display:block;font-size:15.5px}.now span{font-size:13.5px;color:var(--ink2)}
+.now.hd{background:var(--hds)}.now.hd .ic{background:var(--hd)}
+
+/* 2 status first */
+.hero{display:flex;gap:18px;align-items:flex-start}
+.hero .ic{width:56px;height:56px;border-radius:18px;background:var(--hds);color:var(--hd);display:grid;place-items:center;font-size:30px;flex:none}
+.hero h3{margin:0;font-size:24px;letter-spacing:-.02em;line-height:1.25}.hero p{margin:6px 0 0;color:var(--ink2);font-size:15px;max-width:640px}
+.seg{display:flex;gap:6px;margin-top:26px}.seg>div{flex:1}
+.bar{height:10px;border-radius:10px;background:var(--track)}.bar.dn{background:var(--dn)}.bar.hd{background:repeating-linear-gradient(90deg,var(--hd) 0 100%);opacity:.9}
+.seg small{display:block;margin-top:9px;font-size:12.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.seg .dn small{color:var(--ink2)}.seg .hd small{color:var(--hdt);font-weight:600}
+.meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--ln)}.meta div small{display:block;font-size:11.5px;letter-spacing:.1em;font-weight:600;color:var(--mu);text-transform:uppercase}.meta div b{font-size:15px}
+
+/* 3 journey list */
+.jr{display:grid;grid-template-columns:300px 1fr;gap:26px}
+.sum{background:var(--ln2);border-radius:20px;padding:20px}
+.sum .big{font-size:46px}.sum p{margin:6px 0 16px;color:var(--ink2)}
+.sum .r{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--ln)}.sum .r svg{font-size:20px;color:var(--mu);margin-top:1px;flex:none}.sum .r small{display:block;font-size:11.5px;color:var(--mu)}.sum .r b{font-size:14.5px}
+.ls{list-style:none;margin:0;padding:0}
+.ls>li{display:flex;gap:14px;align-items:center;padding:14px 4px;border-bottom:1px solid var(--ln2)}
+.ls>li:last-child{border-bottom:0}
+.ls .ii{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none;background:var(--ln2);color:var(--mu)}
+.ls .dn .ii{background:var(--dns);color:var(--dn)}.ls li.hd .ii{background:var(--hd);color:#fff}
+.ls .tt{flex:1;min-width:0}.ls .tt b{font-size:15.5px}.ls .tt small{display:block;font-size:13px;color:var(--mu)}
+.ls li.hd{background:var(--hds);border-radius:16px;padding:14px 14px;border:0;margin:4px 0}
+.ls li.dn.ex{flex-wrap:wrap}
+.sub{flex-basis:100%;margin:6px 0 0 50px;display:flex;flex-direction:column;gap:6px}
+.sub div{display:flex;gap:10px;align-items:center;font-size:14px;background:var(--nws);border-radius:12px;padding:8px 12px}.sub div svg{font-size:16px;color:var(--nw)}.sub div>span:not(.pill){flex:1}
+
+/* 4 cards */
+.cds{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.cd{border-radius:18px;padding:14px;background:var(--ln2);display:flex;flex-direction:column;gap:6px;min-width:0;position:relative}
+.cd .ci{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:18px;background:var(--card);color:var(--mu)}
+.cd b{font-size:14.5px}.cd .s{font-size:12.5px;color:var(--mu);display:flex;gap:5px;align-items:center}
+.cd.dn{background:var(--dns)}.cd.dn .ci{background:var(--dn);color:#fff}.cd.dn .s{color:var(--dn)}
+.cd.hd{background:var(--hds);box-shadow:inset 0 0 0 2px var(--hd)}.cd.hd .ci{background:var(--hd);color:#fff}.cd.hd .s{color:var(--hdt);font-weight:600}
+.cd .xc{margin-top:4px;font-size:12px;font-weight:600;color:var(--nw);background:var(--card);border-radius:10px;padding:5px 8px;display:flex;gap:5px;align-items:center}.cd .xc svg{font-size:12px}
+.strip{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.strip>div{display:flex;gap:12px;align-items:center;border-radius:16px;padding:14px 16px;background:var(--ln2)}.strip svg{font-size:22px;flex:none}
+.strip small{display:block;font-size:11.5px;letter-spacing:.1em;font-weight:600;color:var(--mu);text-transform:uppercase}.strip b{font-size:15px}
+.strip .p1{background:var(--nws)}.strip .p1 svg{color:var(--nw)}.strip .p2 svg{color:var(--mu)}
+
+/* 5 columns */
+.cols{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:14px}
+.col{border-radius:20px;padding:16px;background:var(--ln2)}
+.col h4{margin:0 0 12px;font-size:12px;letter-spacing:.14em;color:var(--mu);display:flex;justify-content:space-between}
+.col .it{background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.col .it:last-child{margin-bottom:0}.col .it svg{font-size:18px;flex:none}.col .it div{flex:1;min-width:0}.col .it b{font-size:14.5px;display:block}.col .it small{font-size:12.5px;color:var(--mu)}
+.col.c1 .it svg{color:var(--dn)}.col.c2{background:var(--card);box-shadow:inset 0 0 0 1px var(--ln)}
+.col.c2 .it{border:1px solid var(--ln)}.col.c2 .it.w{background:var(--nws);border-color:transparent}.col.c2 .it.w svg{color:var(--nw)}.col.c2 .it.h{background:var(--hds);border-color:var(--hd)}.col.c2 .it.h svg{color:var(--hd)}
+.col.c3 .it svg{color:var(--mu)}
+
+/* 6 ring */
+.rg{display:grid;grid-template-columns:240px 1fr;gap:30px;align-items:center}
+.ring{position:relative;width:200px;height:200px;margin:auto}.ring svg{width:200px;height:200px;transform:rotate(-90deg)}
+.ring .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.ring .in b{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1}.ring .in span{font-size:13px;color:var(--mu);margin-top:4px}
+.chk{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chk span{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:99px;background:var(--ln2);font-size:13.5px;font-weight:500;color:var(--mu)}
+.chk span svg{font-size:13px}.chk .dn{background:var(--dns);color:var(--dn)}.chk .hd{background:var(--hds);color:var(--hdt);box-shadow:inset 0 0 0 1.5px var(--hd);font-weight:600}
+.chk .ar{background:none;padding:0 2px;color:#C9C5BE}
+.today{border-radius:18px;padding:16px 18px;background:var(--ln2)}
+.today small{font-size:11.5px;letter-spacing:.12em;font-weight:600;color:var(--mu)}
+.today .r{display:flex;gap:10px;align-items:center;margin-top:10px}.today .r svg{font-size:18px;flex:none}.today .r b{font-size:15px}.today .r span{font-size:13px;color:var(--mu)}
+.today .r.w svg{color:var(--nw)}.today .r.h svg{color:var(--hd)}
+
+/* phone */
+@media (max-width:600px){
+ .opt{padding:18px 14px 24px}.oh{flex-wrap:wrap;gap:4px 10px}.card{padding:18px 16px;border-radius:22px}.big{font-size:34px}
+ .stp{overflow:visible}.st b{font-size:12px;white-space:nowrap}.st:not(.hd) b{visibility:hidden}.st .s{display:none}.cir{width:34px;height:34px;font-size:13px}.st:before{top:15px}.st.hd .cir{width:40px;height:40px}.st .x{left:calc(50% + 8px)}
+ .hero{flex-direction:column;gap:12px}.hero h3{font-size:20px}.seg small{display:none}.seg .hd small{display:block;overflow:visible}
+ .jr{grid-template-columns:1fr;gap:16px}.sum{padding:16px}.sum .big{font-size:38px}.sub{margin-left:0}
+ .cds{grid-template-columns:repeat(2,1fr)}.strip{grid-template-columns:1fr}
+ .cols{grid-template-columns:1fr}
+ .rg{grid-template-columns:1fr;gap:16px}.ring,.ring svg{width:160px;height:160px}.ring .in b{font-size:36px}
+ .launch{padding:8px 12px}
+}
+</style></head><body>
+
+<!-- 1 -->
+<section class="opt" id="o1"><div class="oh"><b>OPTION 1</b><h2>Simple steps</h2><span>Only stages, no task boxes. One line says what is happening.</span></div>
+<div class="card">
+ <div class="top"><div><div class="big">53%</div><div class="mu sm" style="margin-top:6px">Step 4 of 6 · Marketing is paused</div></div><div class="launch"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M227.32,48.75A8,8,0,0,0,218.76,50c-28,24.22-51.72,12.48-79.21-1.13C111.07,34.76,78.78,18.79,42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,28.49,14.09,60.77,30.06,96.79-1.13a8,8,0,0,0,2.76-6V56A8,8,0,0,0,227.32,48.75ZM216,71.6v40.65c-14,11.06-27,13.22-40,10.88V79.34A60.05,60.05,0,0,0,216,71.6Zm-56,3.76v43c-6.66-2.67-13.43-6-20.45-9.48-8.82-4.37-18-8.91-27.55-12.18v-43c6.66,2.66,13.43,6,20.45,9.48C141.27,67.55,150.46,72.09,160,75.36ZM96,48.91V92.69a60.06,60.06,0,0,0-40,7.75V59.78C70,48.72,83,46.57,96,48.91ZM86.58,152A60.06,60.06,0,0,0,56,160.43V119.78c14-11.06,27-13.22,40-10.88v43.8A65.61,65.61,0,0,0,86.58,152ZM112,156.67v-43c6.66,2.66,13.43,6,20.45,9.48,8.82,4.37,18,8.9,27.55,12.17v43c-6.66-2.67-13.43-6-20.45-9.48C130.73,164.47,121.54,159.94,112,156.67Zm64,26.45v-43.8a65.61,65.61,0,0,0,9.42.72A60.11,60.11,0,0,0,216,131.57v40.68C202,183.31,189,185.46,176,183.12Z"></path></svg><div><small>Launch</small><b>27 Nov</b></div></div></div>
+ <div class="stp">
+  <div class="st dn"><div class="cir"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></div><b>Brief</b><span class="s">Done</span></div>
+  <div class="st dn"><div class="cir"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></div><b>Design</b><span class="s">Done</span></div>
+  <div class="st dn"><div class="cir"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></div><span class="x"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"></path></svg>2</span><b>Build</b><span class="s">Done</span></div>
+  <div class="st hd"><div class="cir"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg></div><b>Marketing</b><span class="s">Paused</span></div>
+  <div class="st"><div class="cir">5</div><b>Review</b><span class="s">Next</span></div>
+  <div class="st"><div class="cir">6</div><b>Launching</b><span class="s">Later</span></div>
+ </div>
+ <div class="now"><div class="ic"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path></svg></div><div><b>Working now: 2 extra items in Build</b><span>Testing and review is in progress. Marketing continues right after. Launch date stays the same.</span></div></div>
+</div></section>
+
+<!-- 2 -->
+<section class="opt" id="o2"><div class="oh"><b>OPTION 2</b><h2>Status first</h2><span>A plain sentence on top, a thin bar below.</span></div>
+<div class="card">
+ <div class="hero"><div class="ic"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM112,96v64a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Z"></path></svg></div><div><h3>Marketing is paused for a short time</h3><p>We are finishing 2 extra items you asked for in Build. Marketing starts again right after. Your launch date stays <b>27 Nov</b>.</p></div></div>
+ <div class="seg"><div class="dn"><div class="bar dn"></div><small>Brief</small></div><div class="dn"><div class="bar dn"></div><small>Design</small></div><div class="dn"><div class="bar dn"></div><small>Build</small></div><div class="hd"><div class="bar hd"></div><small>Marketing · paused</small></div><div><div class="bar"></div><small>Review</small></div><div><div class="bar"></div><small>Launching</small></div></div>
+ <div class="meta"><div><small>Done</small><b>53%</b></div><div><small>Working now</small><b>Testing and review</b></div><div><small>Next</small><b>Review</b></div><div><small>Launch</small><b>27 Nov</b></div></div>
+</div></section>
+
+<!-- 3 -->
+<section class="opt" id="o3"><div class="oh"><b>OPTION 3</b><h2>Journey list</h2><span>Summary on the left, every step as one clear row.</span></div>
+<div class="card"><div class="jr">
+ <div class="sum"><div class="big">53%</div><p>of your project is done</p>
+  <div class="r"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path></svg><div><small>Working now</small><b>Testing and review</b></div></div>
+  <div class="r"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg><div><small>Paused</small><b>Marketing, back soon</b></div></div>
+  <div class="r"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M227.32,48.75A8,8,0,0,0,218.76,50c-28,24.22-51.72,12.48-79.21-1.13C111.07,34.76,78.78,18.79,42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,28.49,14.09,60.77,30.06,96.79-1.13a8,8,0,0,0,2.76-6V56A8,8,0,0,0,227.32,48.75ZM216,71.6v40.65c-14,11.06-27,13.22-40,10.88V79.34A60.05,60.05,0,0,0,216,71.6Zm-56,3.76v43c-6.66-2.67-13.43-6-20.45-9.48-8.82-4.37-18-8.91-27.55-12.18v-43c6.66,2.66,13.43,6,20.45,9.48C141.27,67.55,150.46,72.09,160,75.36ZM96,48.91V92.69a60.06,60.06,0,0,0-40,7.75V59.78C70,48.72,83,46.57,96,48.91ZM86.58,152A60.06,60.06,0,0,0,56,160.43V119.78c14-11.06,27-13.22,40-10.88v43.8A65.61,65.61,0,0,0,86.58,152ZM112,156.67v-43c6.66,2.66,13.43,6,20.45,9.48,8.82,4.37,18,8.9,27.55,12.17v43c-6.66-2.67-13.43-6-20.45-9.48C130.73,164.47,121.54,159.94,112,156.67Zm64,26.45v-43.8a65.61,65.61,0,0,0,9.42.72A60.11,60.11,0,0,0,216,131.57v40.68C202,183.31,189,185.46,176,183.12Z"></path></svg><div><small>Launch</small><b>27 Nov · on track</b></div></div></div>
+ <ul class="ls">
+  <li class="dn"><span class="ii"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></span><div class="tt"><b>Brief</b><small>Finished 17 Nov</small></div><span class="pill dn">Done</span></li>
+  <li class="dn"><span class="ii"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></span><div class="tt"><b>Design</b><small>Finished 17 Nov</small></div><span class="pill dn">Done</span></li>
+  <li class="dn ex"><span class="ii"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></span><div class="tt"><b>Build</b><small>Finished 18 Nov · 2 extra items added</small></div><span class="pill nw"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"></path></svg>2 extra</span>
+   <div class="sub"><div><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path></svg><span>Testing and review</span><span class="pill ip" style="background:var(--nw);color:#fff"><i></i>In progress</span></div><div style="background:var(--ln2)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"></path></svg><span>Database adding</span><span class="pill up">Next</span></div></div></li>
+  <li class="hd"><span class="ii"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg></span><div class="tt"><b>Marketing</b><small>Paused since 18 Nov · continues after Build's extra items</small></div><span class="pill hd"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg>Paused</span></li>
+  <li><span class="ii">5</span><div class="tt"><b>Review</b><small>Planned 22 – 24 Nov</small></div><span class="pill up">Next</span></li>
+  <li><span class="ii">6</span><div class="tt"><b>Launching</b><small>27 Nov</small></div><span class="pill up">Later</span></li>
+ </ul></div></div></section>
+
+<!-- 4 -->
+<section class="opt" id="o4"><div class="oh"><b>OPTION 4</b><h2>Stage cards</h2><span>One small card per stage. Status in words on each.</span></div>
+<div class="card">
+ <div class="top"><div><div class="big">53%</div><div class="mu sm" style="margin-top:6px">of your project is done</div></div><div class="launch"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M227.32,48.75A8,8,0,0,0,218.76,50c-28,24.22-51.72,12.48-79.21-1.13C111.07,34.76,78.78,18.79,42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,28.49,14.09,60.77,30.06,96.79-1.13a8,8,0,0,0,2.76-6V56A8,8,0,0,0,227.32,48.75ZM216,71.6v40.65c-14,11.06-27,13.22-40,10.88V79.34A60.05,60.05,0,0,0,216,71.6Zm-56,3.76v43c-6.66-2.67-13.43-6-20.45-9.48-8.82-4.37-18-8.91-27.55-12.18v-43c6.66,2.66,13.43,6,20.45,9.48C141.27,67.55,150.46,72.09,160,75.36ZM96,48.91V92.69a60.06,60.06,0,0,0-40,7.75V59.78C70,48.72,83,46.57,96,48.91ZM86.58,152A60.06,60.06,0,0,0,56,160.43V119.78c14-11.06,27-13.22,40-10.88v43.8A65.61,65.61,0,0,0,86.58,152ZM112,156.67v-43c6.66,2.66,13.43,6,20.45,9.48,8.82,4.37,18,8.9,27.55,12.17v43c-6.66-2.67-13.43-6-20.45-9.48C130.73,164.47,121.54,159.94,112,156.67Zm64,26.45v-43.8a65.61,65.61,0,0,0,9.42.72A60.11,60.11,0,0,0,216,131.57v40.68C202,183.31,189,185.46,176,183.12Z"></path></svg><div><small>Launch</small><b>27 Nov</b></div></div></div>
+ <div class="cds">
+  <div class="cd dn"><span class="ci"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></span><b>Brief</b><span class="s">Done 17 Nov</span></div>
+  <div class="cd dn"><span class="ci"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></span><b>Design</b><span class="s">Done 17 Nov</span></div>
+  <div class="cd dn"><span class="ci"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg></span><b>Build</b><span class="s">Done 18 Nov</span><span class="xc"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"></path></svg>2 extra · 1 in progress</span></div>
+  <div class="cd hd"><span class="ci"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg></span><b>Marketing</b><span class="s">Paused</span></div>
+  <div class="cd"><span class="ci"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg></span><b>Review</b><span class="s">From 22 Nov</span></div>
+  <div class="cd"><span class="ci"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M223.85,47.12a16,16,0,0,0-15-15c-12.58-.75-44.73.4-71.41,27.07L132.69,64H74.36A15.91,15.91,0,0,0,63,68.68L28.7,103a16,16,0,0,0,9.07,27.16l38.47,5.37,44.21,44.21,5.37,38.49a15.94,15.94,0,0,0,10.78,12.92,16.11,16.11,0,0,0,5.1.83A15.91,15.91,0,0,0,153,227.3L187.32,193A15.91,15.91,0,0,0,192,181.64V123.31l4.77-4.77C223.45,91.86,224.6,59.71,223.85,47.12ZM74.36,80h42.33L77.16,119.52,40,114.34Zm74.41-9.45a76.65,76.65,0,0,1,59.11-22.47,76.46,76.46,0,0,1-22.42,59.16L128,164.68,91.32,128ZM176,181.64,141.67,216l-5.19-37.17L176,139.31Zm-74.16,9.5C97.34,201,82.29,224,40,224a8,8,0,0,1-8-8c0-42.29,23-57.34,32.86-61.85a8,8,0,0,1,6.64,14.56c-6.43,2.93-20.62,12.36-23.12,38.91,26.55-2.5,36-16.69,38.91-23.12a8,8,0,1,1,14.56,6.64Z"></path></svg></span><b>Launching</b><span class="s">27 Nov</span></div>
+ </div>
+ <div class="strip"><div class="p1"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path></svg><div><small>Working now</small><b>Testing and review (Build)</b></div></div><div class="p2"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM112,96v64a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V96a8,8,0,0,1,16,0Z"></path></svg><div><small>Paused</small><b>Marketing, continues right after</b></div></div></div>
+</div></section>
+
+<!-- 5 -->
+<section class="opt" id="o5"><div class="oh"><b>OPTION 5</b><h2>Done · Now · Next</h2><span>Three simple columns, like a to-do board.</span></div>
+<div class="card"><div class="cols">
+ <div class="col c1"><h4>DONE <span>3</span></h4><div class="it"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg><div><b>Brief</b><small>17 Nov</small></div></div><div class="it"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg><div><b>Design</b><small>17 Nov</small></div></div><div class="it"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg><div><b>Build</b><small>18 Nov</small></div></div></div>
+ <div class="col c2"><h4>WORKING NOW <span>53% done</span></h4><div class="it w"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path></svg><div><b>Testing and review</b><small>Extra item in Build · in progress</small></div></div><div class="it"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"></path></svg><div><b>Database adding</b><small>Extra item in Build · next</small></div></div><div class="it h"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg><div><b>Marketing</b><small>Paused · continues after the extra items</small></div></div></div>
+ <div class="col c3"><h4>COMING UP</h4><div class="it"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg><div><b>Review</b><small>22 – 24 Nov</small></div></div><div class="it"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M223.85,47.12a16,16,0,0,0-15-15c-12.58-.75-44.73.4-71.41,27.07L132.69,64H74.36A15.91,15.91,0,0,0,63,68.68L28.7,103a16,16,0,0,0,9.07,27.16l38.47,5.37,44.21,44.21,5.37,38.49a15.94,15.94,0,0,0,10.78,12.92,16.11,16.11,0,0,0,5.1.83A15.91,15.91,0,0,0,153,227.3L187.32,193A15.91,15.91,0,0,0,192,181.64V123.31l4.77-4.77C223.45,91.86,224.6,59.71,223.85,47.12ZM74.36,80h42.33L77.16,119.52,40,114.34Zm74.41-9.45a76.65,76.65,0,0,1,59.11-22.47,76.46,76.46,0,0,1-22.42,59.16L128,164.68,91.32,128ZM176,181.64,141.67,216l-5.19-37.17L176,139.31Zm-74.16,9.5C97.34,201,82.29,224,40,224a8,8,0,0,1-8-8c0-42.29,23-57.34,32.86-61.85a8,8,0,0,1,6.64,14.56c-6.43,2.93-20.62,12.36-23.12,38.91,26.55-2.5,36-16.69,38.91-23.12a8,8,0,1,1,14.56,6.64Z"></path></svg><div><b>Launching</b><small>27 Nov</small></div></div></div>
+</div></div></section>
+
+<!-- 6 -->
+<section class="opt" id="o6"><div class="oh"><b>OPTION 6</b><h2>Ring + today</h2><span>Big progress ring, step names in one line, today's work below.</span></div>
+<div class="card"><div class="rg">
+ <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#EEEAE4" stroke-width="12"/><circle cx="60" cy="60" r="52" fill="none" stroke="#1F9D6B" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="153.5"/></svg><div class="in"><b>53%</b><span>Launch 27 Nov</span></div></div>
+ <div>
+  <div class="chk"><span class="dn"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg>Brief</span><span class="ar"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path></svg></span><span class="dn"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg>Design</span><span class="ar"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path></svg></span><span class="dn"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg>Build</span><span class="ar"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path></svg></span><span class="hd"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg>Marketing · paused</span><span class="ar"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path></svg></span><span>Review</span><span class="ar"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path></svg></span><span>Launching</span></div>
+  <div class="today"><small>TODAY</small><div class="r w"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path></svg><div><b>Testing and review</b> <span>· extra item in Build, in progress</span></div></div><div class="r h"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V208a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h40A16,16,0,0,1,216,48ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Z"></path></svg><div><b>Marketing is paused</b> <span>· continues right after</span></div></div></div>
+ </div></div></div></section>
+
+</body></html>
